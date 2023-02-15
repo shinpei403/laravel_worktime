@@ -36,7 +36,7 @@
                     <button type="button" class="btn btn-primary" onclick="location.href='{{ route('userDetail', ['id' => $user->id]) }}'">詳細</button>
                 </td>
                 <td>
-                    
+                    <button type="button" class="btn btn-primary" onclick="location.href='{{ route('userEdit', ['id' => $user->id]) }}'">編集</button>
                 </td>
                 <td>
                     

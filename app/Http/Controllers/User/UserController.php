@@ -71,4 +71,49 @@ class UserController extends Controller
         return view('user.detail', ['user' => $user]);
 
     }
+
+    /**
+     * 従業員編集画面を表示する
+     * @param int $id
+     * @return view
+     */
+    public function showUserEdit($id)
+    {
+        $user = User::find($id);
+
+        if(is_null($user) || $user->delete_flg === 1)
+        {
+            return redirect(route('userIndex'))->with('err_msg', 'データがありません。');
+
+        } 
+
+        return view('user.edit', ['user' => $user]);
+
+    }
+
+    /**
+     * 従業員更新
+     * @return view
+     */
+    public function exeUserUpdate(UserRequest $request)
+    {
+        $inputs = $request->all();
+        \DB::beginTransaction();
+        try{
+            // 従業員を更新  
+            $user = User::find($inputs['id']);
+            $user->fill([
+                'code' => $inputs['code'],
+                'name' => $inputs['name'],
+                'password' => $inputs['password'],
+            ]);
+            $user->save();
+            \DB::commit();
+        } catch(\Throwable $e){
+            \DB::rollback();
+            abort(500);
+        }
+        
+        return redirect(route('userIndex'))->with('success', '更新が完了しました。');
+    }
 }
