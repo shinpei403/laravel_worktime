@@ -51,4 +51,24 @@ class UserController extends Controller
         
         return redirect(route('userIndex'))->with('success', '登録が完了しました。');
     }
+
+    /**
+     * 従業員詳細画面を表示する
+     * @param int $id
+     * @return view
+     */
+    public function showUserDetail($id)
+    {
+        $user = User::find($id);
+
+        if(is_null($user) || $user->delete_flg === 1)
+        {
+
+        return redirect(route('userIndex'))->with('err_msg', 'データがありません。');
+        
+        }
+
+        return view('user.detail', ['user' => $user]);
+
+    }
 }

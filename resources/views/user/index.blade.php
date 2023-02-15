@@ -33,7 +33,7 @@
                   <td></td>
                 @else
                 <td>
-            
+                    <button type="button" class="btn btn-primary" onclick="location.href='{{ route('userDetail', ['id' => $user->id]) }}'">詳細</button>
                 </td>
                 <td>
                     

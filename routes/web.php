@@ -11,3 +11,6 @@ Route::get('/user/create', [UserController::class, 'showUserCreate'])->name('use
 
 // 従業員登録
 Route::post('/user/store', [UserController::class, 'exeUserStore'])->name('userStore');
+
+// 従業員詳細画面を表示
+Route::get('/user/{id}', [UserController::class, 'showUserDetail'])->name('userDetail');
