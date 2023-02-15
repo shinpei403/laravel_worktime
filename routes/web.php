@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\User\UserController;
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\Worktime\WorktimeController;
 
 //従業員一覧画面を表示
 Route::get('/user/index', [UserController::class, 'showUserIndex'])->name('userIndex');
@@ -27,3 +28,9 @@ Route::get('/user/{id}', [UserController::class, 'showUserDetail'])->name('userD
 
 //ログインフォームを表示
 Route::get('login/show', [AuthController::class, 'showLogin'])->name('showLogin');
+
+//ログイン処理
+Route::post('login/login', [AuthController::class, 'exeLogin'])->name('Login');
+
+//勤怠登録画面を表示示
+Route::get('worktime/create', [WorktimeController::class, 'showcreate'])->name('worktimeCreate');
