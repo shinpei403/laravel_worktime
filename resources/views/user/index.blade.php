@@ -45,7 +45,7 @@
             </tr>
             @endforeach
         </table>
-        
+        <a href="{{ route('userCreate') }}" class="link-primary">新規従業員の登録</a>
     </div>
   </div>
   <script>
