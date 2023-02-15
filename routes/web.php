@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\User\UserController;
+use App\Http\Controllers\Auth\AuthController;
 
 //従業員一覧画面を表示
 Route::get('/user/index', [UserController::class, 'showUserIndex'])->name('userIndex');
@@ -23,3 +24,6 @@ Route::post('/user/delete/{id}', [UserController::class, 'exeUserDelete'])->name
 
 // 従業員詳細画面を表示
 Route::get('/user/{id}', [UserController::class, 'showUserDetail'])->name('userDetail');
+
+//ログインフォームを表示
+Route::get('login/show', [AuthController::class, 'showLogin'])->name('showLogin');
