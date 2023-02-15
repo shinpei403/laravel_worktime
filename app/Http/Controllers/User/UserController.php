@@ -116,4 +116,26 @@ class UserController extends Controller
         
         return redirect(route('userIndex'))->with('success', '更新が完了しました。');
     }
+
+    /**
+     * 従業員削除
+     * @param int $id
+     * @return view
+     */
+    public function exeUserDelete($id)
+    {
+        try{
+            // 従業員を削除  
+            $user = User::find($id);
+            $user->delete_flg = 1;
+            $user->save();
+            \DB::commit();
+        } catch(\Throwable $e){
+            \DB::rollback();
+            abort(500);
+        }
+
+        return redirect(route('userIndex'))->with('success', '削除が完了しました。');
+
+    }
 }

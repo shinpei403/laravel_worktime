@@ -2,7 +2,7 @@
 @section('title', '従業員一覧')
 @section('content')
   <div class="row">
-    <div class="col-md-10 col-md-offset-2">
+    <div class="col-md-9 offset-1">
         <h2>従業員一覧</h2>
         </br>
         @if (session('success'))
@@ -39,7 +39,10 @@
                     <button type="button" class="btn btn-primary" onclick="location.href='{{ route('userEdit', ['id' => $user->id]) }}'">編集</button>
                 </td>
                 <td>
-                    
+                    <form  method="POST" action="{{ route('userDelete', ['id' => $user->id]) }}" onSubmit="return checkDelete()">
+                        @csrf         
+                        <button type="submit" class="btn btn-danger">削除</button>
+                    </form>
                 </td>
                 @endif
             </tr>

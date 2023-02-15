@@ -18,5 +18,8 @@ Route::get('/user/edit/{id}', [UserController::class, 'showUserEdit'])->name('us
 // 従業員更新
 Route::post('/user/update', [UserController::class, 'exeUserUpdate'])->name('userUpdate');
 
+// 従業員削除
+Route::post('/user/delete/{id}', [UserController::class, 'exeUserDelete'])->name('userDelete');
+
 // 従業員詳細画面を表示
 Route::get('/user/{id}', [UserController::class, 'showUserDetail'])->name('userDetail');
