@@ -32,5 +32,8 @@ Route::get('login/show', [AuthController::class, 'showLogin'])->name('showLogin'
 //ログイン処理
 Route::post('login/login', [AuthController::class, 'exeLogin'])->name('Login');
 
+// ログアウト処理
+Route::post('login/logout', [AuthController::class, 'exeLogout'])->name('Logout');
+
 //勤怠登録画面を表示示
 Route::get('worktime/create', [WorktimeController::class, 'showcreate'])->name('worktimeCreate');

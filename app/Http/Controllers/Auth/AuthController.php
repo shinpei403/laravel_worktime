@@ -29,11 +29,28 @@ class AuthController extends Controller
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
 
-            return redirect(route('worktimeCreate'))->with('login_success', 'ログインしました。');
+            return redirect()->route('worktimeCreate')->with('login_success', 'ログインしました。');
         }
         
         return back()->withErrors([
             'login_error' => '従業員番号かパスワードが間違っています。',
         ]);
+    }
+
+    /**
+     * ユーザーをアプリケーションからログアウトさせる
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function exeLogout(Request $request)
+    {
+        Auth::logout();
+
+        $request->session()->invalidate();
+
+        $request->session()->regenerateToken();
+
+        return redirect()->route('showLogin')->with('logout', 'ログアウトしました。');
     }
 }

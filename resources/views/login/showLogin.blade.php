@@ -9,6 +9,11 @@
           <li>{{$error}}</li>
         </ul>
       @endforeach
+      @if (session('logout'))
+          <div class="alert alert-success">
+              {{ session('logout') }}
+          </div>
+      @endif
       <form method="POST" action="{{ route('Login') }}">
         @csrf
         <div class="form-group">

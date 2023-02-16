@@ -9,5 +9,10 @@
         {{ session('login_success') }}
     </div>
 @endif
+
+<form action="{{ route('Logout')  }}" method="POST">
+    @csrf
+    <button class="btn btn-danger">ログアウト</button>
+</form>
   
 @endsection
