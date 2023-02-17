@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Http\Requests\UserRequest;
+use App\Http\Requests\UpdateUserRequest;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 
 class UserController extends Controller
 {
@@ -41,11 +44,15 @@ class UserController extends Controller
         $inputs = $request->all();
         \DB::beginTransaction();
         try{
+            // パスワードをハッシュ化
+            $inputs['password'] = Hash::make($inputs['password']);
+
             // 従業員登録  
             User::create($inputs);
             \DB::commit();
         } catch(\Throwable $e){
             \DB::rollback();
+            Log::error($e->getMessage());
             abort(500);
         }
         
@@ -95,7 +102,7 @@ class UserController extends Controller
      * 従業員更新
      * @return view
      */
-    public function exeUserUpdate(UserRequest $request)
+    public function exeUserUpdate(UpdateUserRequest $request)
     {
         $inputs = $request->all();
         \DB::beginTransaction();
@@ -105,12 +112,15 @@ class UserController extends Controller
             $user->fill([
                 'code' => $inputs['code'],
                 'name' => $inputs['name'],
-                'password' => $inputs['password'],
             ]);
+            if($inputs['password']){
+                $user->fill(['password' => Hash::make($inputs['password'])]);
+            }
             $user->save();
             \DB::commit();
         } catch(\Throwable $e){
             \DB::rollback();
+            Log::error($e->getMessage());
             abort(500);
         }
         
@@ -132,6 +142,7 @@ class UserController extends Controller
             \DB::commit();
         } catch(\Throwable $e){
             \DB::rollback();
+            Log::error($e->getMessage());
             abort(500);
         }
 

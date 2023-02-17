@@ -25,7 +25,7 @@
             @endif
             </br>
             <label for="passwoed">パスワード</label>
-            <input type="password" name="password" class="form-control" value = "{{ $user->password }}">
+            <input type="password" name="password" class="form-control">
             @if ($errors->has('password'))
               <div class="text-danger">
                 {{ $errors->first('password') }}
