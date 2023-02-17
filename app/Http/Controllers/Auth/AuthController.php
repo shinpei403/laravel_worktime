@@ -29,12 +29,10 @@ class AuthController extends Controller
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
 
-            return redirect()->route('worktimeCreate')->with('login_success', 'ログインしました。');
+            return redirect()->route('worktimeCreate')->with('success', 'ログインしました。');
         }
         
-        return back()->withErrors([
-            'login_error' => '従業員番号かパスワードが間違っています。',
-        ]);
+        return back()->with('danger', '従業員番号かパスワードが間違っています。');
     }
 
     /**
@@ -51,6 +49,6 @@ class AuthController extends Controller
 
         $request->session()->regenerateToken();
 
-        return redirect()->route('showLogin')->with('logout', 'ログアウトしました。');
+        return redirect()->route('showLogin')->with('success', 'ログアウトしました。');
     }
 }

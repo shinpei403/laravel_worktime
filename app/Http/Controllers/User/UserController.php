@@ -64,7 +64,7 @@ class UserController extends Controller
         if(is_null($user) || $user->delete_flg === 1)
         {
 
-        return redirect(route('userIndex'))->with('err_msg', 'データがありません。');
+        return redirect(route('userIndex'))->with('danger', 'データがありません。');
         
         }
 
@@ -83,7 +83,7 @@ class UserController extends Controller
 
         if(is_null($user) || $user->delete_flg === 1)
         {
-            return redirect(route('userIndex'))->with('err_msg', 'データがありません。');
+            return redirect(route('userIndex'))->with('danger', 'データがありません。');
 
         } 
 

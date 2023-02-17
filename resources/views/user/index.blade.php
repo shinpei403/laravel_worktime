@@ -5,16 +5,11 @@
     <div class="col-md-9 offset-1">
         <h2>従業員一覧</h2>
         </br>
-        @if (session('success'))
-            <div class="alert alert-success">
-                {{ session('success') }}
-            </div>
-        @endif
-        @if (session('err_msg'))
-            <div class="alert alert-danger">
-                {{ session('err_msg') }}
-            </div>
-        @endif
+        
+        <x-alert type="success" :session="session('success')" />
+
+        <x-alert type="danger" :session="session('danger')" />
+
         <table class="table table-striped">
             <tr>
                 <th>従業員番号</th>
