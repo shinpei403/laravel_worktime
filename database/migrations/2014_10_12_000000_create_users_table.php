@@ -23,7 +23,8 @@ class CreateUsersTable extends Migration
                 $table->string('role')->nullable();
                 $table->tinyInteger('locked_flg')->default(0);
                 $table->tinyInteger('delete_flg')->default(0);
-                $table->timestamps();
+                $table->timestamp('updated_at')->useCurrent()->nullable();
+                $table->timestamp('created_at')->useCurrent()->nullable();
             });
         }
     }

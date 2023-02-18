@@ -27,6 +27,11 @@ class User extends Authenticatable
         'updated_at',
     ];
 
+    public function worktime()
+    {
+        return $this->hasOne('App\Models\Worktime');
+    }
+
     /**
      * The attributes that should be hidden for arrays.
      *
