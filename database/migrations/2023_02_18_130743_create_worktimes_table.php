@@ -17,10 +17,10 @@ class CreateWorktimesTable extends Migration
             Schema::create('worktimes', function (Blueprint $table) {
                 $table->id();
                 $table->unsignedBigInteger('user_id');
-                $table->date('date');
+                $table->date('date')->default(DB::raw('CURRENT_TIMESTAMP'))->nullable();
                 $table->time('start_time');
-                $table->time('end_time');
-                $table->time('break_time');
+                $table->time('end_time')->nullable();
+                $table->tinyInteger('working_flg')->default(1);
                 $table->timestamp('updated_at')->useCurrent()->nullable();
                 $table->timestamp('created_at')->useCurrent()->nullable();
 

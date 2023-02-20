@@ -29,8 +29,11 @@ Route::middleware(['auth'])->group(function () {
   // 従業員詳細画面を表示
   Route::get('/user/{id}', [UserController::class, 'showUserDetail'])->name('userDetail');
 
-  //勤怠登録画面を表示示
-  Route::get('worktime/create', [WorktimeController::class, 'showcreate'])->name('worktimeCreate');
+  //勤怠登録画面を表示
+  Route::get('worktime/create', [WorktimeController::class, 'showWorktimeCreate'])->name('worktimeCreate');
+
+  //勤怠登録
+  Route::post('worktime/store', [WorktimeController::class, 'exeWorktimeStore'])->name('worktimeStore');
 
   // ログアウト処理
   Route::post('login/logout', [AuthController::class, 'exeLogout'])->name('Logout');
