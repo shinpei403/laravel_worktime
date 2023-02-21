@@ -49,4 +49,15 @@ class WorktimeController extends Controller
         return redirect(route('worktimeCreate'))->with('success', '登録が完了しました。');
 
     }
+
+    public function showWorktimeIndex()
+    {
+        $worktimes = Worktime::where('user_id', auth()->id())
+                    ->whereYear('date', now()->year)
+                    ->whereMonth('date', now()->month)
+                    ->orderBy('date', 'asc')
+                    ->get();
+        return view('worktime.index', ['worktimes' => $worktimes]);
+    }
+
 }

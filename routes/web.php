@@ -35,6 +35,9 @@ Route::middleware(['auth'])->group(function () {
   //勤怠登録
   Route::post('worktime/store', [WorktimeController::class, 'exeWorktimeStore'])->name('worktimeStore');
 
+  //勤怠一覧を表示
+  Route::get('worktime/index', [WorktimeController::class, 'showWorktimeIndex'])->name('worktimeIndex');
+
   // ログアウト処理
   Route::post('login/logout', [AuthController::class, 'exeLogout'])->name('Logout');
   
