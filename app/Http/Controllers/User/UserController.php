@@ -18,7 +18,7 @@ class UserController extends Controller
      */
     public function showUserIndex()
     {
-        $users = User::all();
+        $users = User::orderBy('created_at')->paginate(10);
 
         return view('user.index', ['users' => $users]);
 

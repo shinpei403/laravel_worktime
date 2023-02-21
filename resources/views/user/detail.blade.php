@@ -15,6 +15,14 @@
                 <td>{{ $user->name }}</td>
             </tr>
             <tr>
+                <th>権限</th>
+                @if ($user->role === 'admin')
+                <td>管理者</td>
+                @else
+                <td>一般</td>
+                @endif
+            </tr>
+            <tr>
                 <th>登録日時</th>
                 <td>{{ $user->created_at }}</td>
             </tr>

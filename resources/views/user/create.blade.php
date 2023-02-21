@@ -2,7 +2,7 @@
 @section('title', '従業員登録')
 @section('content')
   <div class="row">
-    <div class="col-md-8 offset-2">
+    <div class="col-md-6 offset-3">
         <h2>従業員登録</h2>
         </br>
         <form method="POST" action="{{ route('userStore') }}">
@@ -32,6 +32,11 @@
               </div>
             @endif
             </br>
+            <label for="role">権限</label>
+            <select class="form-control col-md-3" name="role">
+              <option value="">一般</option>
+              <option value="admin" <?php if(old('role') === "admin") echo "selected"; ?>>管理者</option>
+            </select>
           </div>
           <button type="submit" class="btn btn-primary">登録</button>
         </form>

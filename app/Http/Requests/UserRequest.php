@@ -26,7 +26,7 @@ class UserRequest extends FormRequest
         return [
             'code' => 'required|regex:/^d([0-9]{5})/|unique:users',
             'name' => 'required|max:100',
-            'password'=> 'required'#|regex:/^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z\-]{8,24}$/',後で直す
+            'password'=> 'required|regex:/^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z\-]{8,24}$/'
         ];
     }
 }

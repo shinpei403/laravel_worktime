@@ -21,6 +21,7 @@ class User extends Authenticatable
         'name',
         'password',
         'error_count',
+        'role',
         'locked_flg',
         'delete_flg',
         'created_at',

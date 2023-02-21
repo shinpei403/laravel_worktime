@@ -3,16 +3,18 @@
         <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <a class="navbar-brand" href="#">勤怠管理システム</a>
+        <a class="navbar-brand" href="{{ route('worktimeCreate') }}">勤怠管理システム</a>
         @auth
         <div class="collapse navbar-collapse">
             <ul class="navbar-nav">
                 <li class="nav-item active">
-                    <a class="nav-link" href="{{ route('worktimeCreate') }}">勤怠管理</a>
+                    <a class="nav-link" href="{{ route('worktimeIndex') }}">勤怠一覧</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ route('userIndex') }}">従業員管理</a>
-                </li>
+                @if(Auth::user()->role === 'admin')
+                    <li class="nav-item active">
+                        <a class="nav-link" href="{{ route('userIndex') }}">従業員管理</a>
+                    </li>
+                @endif
             </ul>
             <ul class="navbar-nav ml-auto">
                 <li class="nav-item dropdown">

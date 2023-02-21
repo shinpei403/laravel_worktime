@@ -2,7 +2,7 @@
 @section('title', '従業員編集')
 @section('content')
   <div class="row">
-    <div class="col-md-10 col-md-offset-2">
+    <div class="col-md-6 offset-3">
         <h2>id : {{ $user->id }} の従業員情報 編集ページ</h2>
         </br>
         <form method="POST" action="{{ route('userUpdate') }}">
@@ -32,6 +32,11 @@
               </div>
             @endif
             </br>
+            <label for="role">権限</label>
+            <select class="form-control col-md-3" name="role">
+              <option value="">一般</option>
+              <option value="admin" <?php if($user->role === "admin") echo "selected"; ?>>管理者</option>
+            </select>
           </div>
           <input type="hidden" name="id" value="{{ $user->id }}">
           <button type="submit" class="btn btn-primary">更新</button>

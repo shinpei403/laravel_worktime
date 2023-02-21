@@ -26,6 +26,7 @@
             </tr>
             @endforeach
         </table>
+        {{ $worktimes->links() }}
         <a href="{{ route('worktimeCreate') }}" class="link-primary">勤怠登録画面に戻る</a>
     </div>
   </div>

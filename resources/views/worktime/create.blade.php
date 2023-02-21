@@ -44,7 +44,6 @@
               </div>
           </div>
       </form>
-      <a href="{{ route('worktimeIndex') }}" class="link-primary">勤怠一覧画面</a>
     </div>
 </div>
 

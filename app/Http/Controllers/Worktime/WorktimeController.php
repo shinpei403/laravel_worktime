@@ -56,7 +56,7 @@ class WorktimeController extends Controller
                     ->whereYear('date', now()->year)
                     ->whereMonth('date', now()->month)
                     ->orderBy('date', 'asc')
-                    ->get();
+                    ->paginate(10);
         return view('worktime.index', ['worktimes' => $worktimes]);
     }
 
