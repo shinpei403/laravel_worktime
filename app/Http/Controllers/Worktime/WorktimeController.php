@@ -91,6 +91,7 @@ class WorktimeController extends Controller
             $worktime->fill([
                 'start_time' => $inputs['start_time'],
                 'end_time' => $inputs['end_time'],
+                'working_flg' => 0,
             ]);
             $worktime->save();
             \DB::commit();

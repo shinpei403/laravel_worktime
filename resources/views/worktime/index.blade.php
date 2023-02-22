@@ -30,11 +30,12 @@
                 <td>{{ Carbon\Carbon::parse($worktime->start_time)->format('H:i'); }}</td>
                 @if (is_null($worktime->end_time))
                   <td>(就業中)</td>
+                  <td></td>
                 @else
                   <td>{{ Carbon\Carbon::parse($worktime->end_time)->format('H:i'); }}</td>
+                  <!-- 休憩時間は1時間とする -->
+                  <td>{{ max(Carbon\Carbon::parse($worktime->end_time)->diffInMinutes(Carbon\Carbon::parse($worktime->start_time)) - 9*60, 0) }}分</td> 
                 @endif
-                <!-- 休憩時間は1時間とする -->
-                <td>{{ max(Carbon\Carbon::parse($worktime->end_time)->diffInMinutes(Carbon\Carbon::parse($worktime->start_time)) - 9*60, 0) }}分</td> 
                 @if(Auth::user()->role === 'admin')
                   <td>
                     <button type="button" class="btn btn-primary" onclick="location.href='{{ route('worktimeEdit', ['id' => $worktime->id]) }}'">編集</button>
