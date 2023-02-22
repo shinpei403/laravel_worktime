@@ -53,11 +53,19 @@ class WorktimeController extends Controller
 
     public function showWorktimeIndex()
     {
-        $worktimes = Worktime::where('user_id', auth()->id())
-                    ->whereYear('date', now()->year)
+        if(auth()->user()->role === 'admin'){
+            $worktimes = Worktime::whereYear('date', now()->year)
                     ->whereMonth('date', now()->month)
                     ->orderBy('date', 'asc')
                     ->paginate(10);
+        } else{
+            $worktimes = Worktime::where('user_id', auth()->id())
+                        ->whereYear('date', now()->year)
+                        ->whereMonth('date', now()->month)
+                        ->orderBy('date', 'asc')
+                        ->paginate(10);
+        }
+
         return view('worktime.index', ['worktimes' => $worktimes]);
     }
 
