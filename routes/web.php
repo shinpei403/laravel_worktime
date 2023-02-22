@@ -30,6 +30,12 @@ Route::middleware(['auth'])->group(function () {
       
       // 従業員詳細画面を表示
       Route::get('/user/{id}', [UserController::class, 'showUserDetail'])->name('userDetail');
+
+      //勤怠編集画面を表示
+      Route::get('worktime/edit/{id}', [WorktimeController::class, 'showWorktimeEdit'])->name('worktimeEdit');
+
+      //勤怠更新
+      Route::post('worktime/update', [WorktimeController::class, 'exeWorktimeUpdate'])->name('worktimeUpdate');
   });
 
   //勤怠登録画面を表示

@@ -161,5 +161,7 @@ return [
         'code' => '従業員番号',
         'name' => '従業員名',
         'password' => 'パスワード',
+        'start_time' => '出勤時間',
+        'end_time' => '退勤時間',
     ],
 ];

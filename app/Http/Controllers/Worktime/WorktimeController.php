@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Worktime;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
+use App\Http\Requests\UpdateWorktimeRequest;
 
 class WorktimeController extends Controller
 {
@@ -60,4 +61,37 @@ class WorktimeController extends Controller
         return view('worktime.index', ['worktimes' => $worktimes]);
     }
 
+    public function showWorktimeEdit($id)
+    {
+        $worktime = Worktime::find($id);
+        if(is_null($worktime))
+        {
+            return redirect(route('worktimeIndex'))->with('danger', 'データがありません。');
+
+        } 
+
+        return view('worktime.edit', ['worktime' => $worktime]);
+    }
+
+    public function exeWorktimeUpdate(UpdateWorktimeRequest $request)
+    {
+        $inputs = $request->all();
+        \DB::beginTransaction();
+        try{
+            // 従業員を更新  
+            $worktime = Worktime::find($inputs['id']);
+            $worktime->fill([
+                'start_time' => $inputs['start_time'],
+                'end_time' => $inputs['end_time'],
+            ]);
+            $worktime->save();
+            \DB::commit();
+        } catch(\Throwable $e){
+            \DB::rollback();
+            Log::error($e->getMessage());
+            abort(500);
+        }
+
+        return redirect(route('worktimeIndex'))->with('success', '更新が完了しました。');
+    }
 }

@@ -3,7 +3,7 @@
 @section('content')
   <div class="row">
     <div class="col-md-6 offset-3">
-        <h2>id : {{ $user->id }} の従業員情報 編集ページ</h2>
+        <h2>id : {{ $user->id }} の従業員情報 編集</h2>
         </br>
         <form method="POST" action="{{ route('userUpdate') }}">
           @csrf
