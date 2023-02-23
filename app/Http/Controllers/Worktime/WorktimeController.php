@@ -51,22 +51,36 @@ class WorktimeController extends Controller
 
     }
 
-    public function showWorktimeIndex()
+    public function showWorktimeIndex(Request $request)
     {
+        if($request['month']){
+            $selectedMonth = $request['month'];
+        }else{
+            $selectedMonth = Carbon::now()->format('m');
+        }
+
+        $months = [];
+        for ($i = 1; $i <= 12; $i++) {
+            $month = Carbon::create(null, $i, null, 0, 0, 0);
+            $key = $month->format('m');
+            $value = $month->format('m月');
+            $months[$key] = $value;
+        }
+        
         if(auth()->user()->role === 'admin'){
             $worktimes = Worktime::whereYear('date', now()->year)
-                    ->whereMonth('date', now()->month)
-                    ->orderBy('date', 'asc')
-                    ->paginate(10);
+                        ->whereMonth('date', $selectedMonth)
+                        ->orderBy('date', 'asc')
+                        ->paginate(10);
         } else{
             $worktimes = Worktime::where('user_id', auth()->id())
                         ->whereYear('date', now()->year)
-                        ->whereMonth('date', now()->month)
+                        ->whereMonth('date', $selectedMonth)
                         ->orderBy('date', 'asc')
                         ->paginate(10);
         }
-
-        return view('worktime.index', ['worktimes' => $worktimes]);
+        
+        return view('worktime.index', ['worktimes' => $worktimes, 'months' => $months, 'selectedMonth' => $selectedMonth]);
     }
 
     public function showWorktimeEdit($id)

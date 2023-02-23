@@ -10,6 +10,25 @@
 
         <x-alert type="danger" :session="session('danger')" />
         
+        @if($worktimes->isEmpty())
+          <div class="alert alert-warning" role="alert">
+              対象月の勤怠情報はありませんでした。
+          </div>
+        @endif
+        
+        <form method="GET" action="{{ route('worktimeIndex') }}">
+          <div class="form-group">
+            <label for="month">月を選択してください</label>
+            <select name="month" class="form-control col-md-2">
+              @foreach($months as $key => $month)
+                <option value="{{ $key }}" <?php if($selectedMonth === $key) echo "selected"; ?>>{{ $month }}</option>
+              @endforeach
+            </select>
+          </div>
+          <button type="submit" class="btn btn-primary">表示</button>
+        </form>
+        </br>
+
         <table class="table table-striped">
             <tr>
                 <th>出勤日</th>
