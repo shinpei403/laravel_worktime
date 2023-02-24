@@ -3,7 +3,7 @@
 @section('content')
   <div class="row">
     <div class="col-md-12">
-        <h2>勤怠一覧</h2>
+        <h2>{{ $selectedMonth }} 月の勤怠一覧</h2>
         </br>
 
         <x-alert type="success" :session="session('success')" />
@@ -21,7 +21,7 @@
             <label for="month">月を選択してください</label>
             <select name="month" class="form-control col-md-2">
               @foreach($months as $key => $month)
-                <option value="{{ $key }}" <?php if($selectedMonth === $key) echo "selected"; ?>>{{ $month }}</option>
+                <option value="{{ $key }}" <?php if($selectedMonth == $key) echo "selected"; ?>>{{ $month }}</option>
               @endforeach
             </select>
           </div>
@@ -63,7 +63,14 @@
             </tr>
             @endforeach
         </table>
-        {{ $worktimes->links() }}
+        <div class="d-flex justify-content-center align-items-start">
+          <div class="pr-3">
+            {{ $worktimes->links() }}
+          </div>
+          @if(Auth::user()->role === 'admin')
+            <a href="{{ route('worktimeCsvDetail', ['month' => $selectedMonth]) }}" class="btn btn-primary">明細表出力</a>
+          @endif
+        </div>
         <a href="{{ route('worktimeCreate') }}" class="link-primary">勤怠登録画面に戻る</a>
     </div>
   </div>
