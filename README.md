@@ -28,6 +28,10 @@
   
   3.ログイン後、各機能を使用することが出来ます。<br>
   
+## 注意事項
+
+　本アプリケーションはLaravel 8.xで開発されています。Laravelのバージョンを確認し、必要に応じてアップグレードしてからご利用ください。
+  
 ## Licence
 
 This software is released under the MIT License, see LICENSE.
