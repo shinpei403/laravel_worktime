@@ -23,6 +23,9 @@
 
 ![cab4cde9aedd3f4ea80534787c52fb86](https://user-images.githubusercontent.com/104670465/221192306-1f9fce9e-3934-4164-9e72-ee1cf16a3527.gif)
 
+
+![682756181828cbbc7a6e106d48202ff5](https://user-images.githubusercontent.com/104670465/221198749-0c6c7e49-6d24-46dd-92cd-30cbbf8fc76b.gif)
+
 ## インストール方法
 <ol>
   <li>このリポジトリをクローンする。</li>
