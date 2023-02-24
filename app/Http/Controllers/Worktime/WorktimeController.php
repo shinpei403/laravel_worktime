@@ -11,7 +11,6 @@ use App\Http\Requests\UpdateWorktimeRequest;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Response;
 use League\Csv\Writer;
-use DateTime;
 
 class WorktimeController extends Controller
 {
@@ -124,65 +123,145 @@ class WorktimeController extends Controller
 
     public function exeWorktimeCsvDetail(Request $request)
     {
-        $month = intval($request['month']);
+        if(intval($request['month']) >= 1 && intval($request['month']) <= 12){
 
-        $worktimes = DB::table('worktimes as W') 
-                    ->select('W.date', 'U.code', 'U.name')
-                    ->selectRaw('SEC_TO_TIME(
-                                        CASE
-                                            WHEN TIME_TO_SEC(TIMEDIFF(W.end_time, W.start_time)) >= 9*3600
-                                                THEN TIME_TO_SEC(TIMEDIFF(W.end_time, W.start_time)) - 3600
-                                            ELSE
-                                                TIME_TO_SEC(TIMEDIFF(W.end_time, W.start_time))
-                                        END
-                                    ) as workingtime')
-                    ->selectRaw('SEC_TO_TIME(
-                                        CASE
-                                            WHEN TIME_TO_SEC(TIMEDIFF(W.end_time, W.start_time)) >= 9*3600
-                                                THEN TIME_TO_SEC(TIMEDIFF(W.end_time, W.start_time)) - 32400
-                                            ELSE
-                                                0
-                                        END
-                                    ) as overtime')
-                    ->join('users as U', 'W.user_id', '=', 'U.id')
-                    ->whereMonth('W.date', $month)
-                    ->orderBy('code', 'asc')
-                    ->orderBy('date', 'asc')
-                    ->get();
+            $month = intval($request['month']);
 
-        // ヘッダーを設定する
-        $header = ['出勤日', '従業員番号', '従業員名', '労働時間', '残業時間'];
-
-        // 各行の設定をする
-        $rows = [];
-
-        foreach($worktimes as $worktime){
+            $worktimes = DB::table('worktimes as W') 
+                        ->select('W.date', 'U.code', 'U.name')
+                        ->selectRaw('SEC_TO_TIME(
+                                            CASE
+                                                WHEN TIME_TO_SEC(TIMEDIFF(W.end_time, W.start_time)) >= 9*3600
+                                                    THEN TIME_TO_SEC(TIMEDIFF(W.end_time, W.start_time)) - 3600
+                                                ELSE
+                                                    TIME_TO_SEC(TIMEDIFF(W.end_time, W.start_time))
+                                            END
+                                        ) as workingtime')
+                        ->selectRaw('SEC_TO_TIME(
+                                            CASE
+                                                WHEN TIME_TO_SEC(TIMEDIFF(W.end_time, W.start_time)) >= 9*3600
+                                                    THEN TIME_TO_SEC(TIMEDIFF(W.end_time, W.start_time)) - 32400
+                                                ELSE
+                                                    0
+                                            END
+                                        ) as overtime')
+                        ->join('users as U', 'W.user_id', '=', 'U.id')
+                        ->whereYear('W.date', now()->year)
+                        ->whereMonth('W.date', $month)
+                        ->orderBy('code', 'asc')
+                        ->orderBy('date', 'asc')
+                        ->get();
             
-            $workingtime = new DateTime($worktime->workingtime);
-            $overtime = new DateTime($worktime->overtime);
+            //コレクションが空なら戻す
+            if($worktimes->isEmpty()){
+                return redirect(route('worktimeIndex'))->with('danger', 'データがありません。');
+            }
 
-            $rows[] = [
-                $worktime->date,
-                $worktime->code,
-                $worktime->name,
-                $workingtime->format('H:i'),
-                $overtime->format('H:i'),
-            ];
+            // ヘッダーを設定する
+            $header = ['出勤日', '従業員番号', '従業員名', '労働時間', '残業時間'];
+
+            // 各行の設定をする
+            $rows = [];
+
+            foreach($worktimes as $worktime){
+            
+                $rows[] = [
+                    $worktime->date,
+                    $worktime->code,
+                    $worktime->name,
+                    $worktime->workingtime,
+                    $worktime->overtime,
+                ];
+            }
+
+            // CSVファイルを作成し、データを書き込む
+            $csv = Writer::createFromString('');
+            $csv->insertOne($header);
+            $csv->insertAll($rows);
+            $csvDate = $csv->getContent();
+            $csvDate = mb_convert_encoding($csvDate, 'SJIS-win', 'UTF-8');
+            
+            // CSVをダウンロードするためのレスポンスを作成する
+            $response = new Response($csvDate, 200, [
+                'Content-Type' => 'text/csv',
+                'Content-Disposition' => 'attachment; filename=' . $month . '月の勤怠情報の一覧.csv'
+            ]);
+        
+            return $response;
         }
 
-        // CSVファイルを作成し、データを書き込む
-        $csv = Writer::createFromString('');
-        $csv->insertOne($header);
-        $csv->insertAll($rows);
-        $csvDate = $csv->getContent();
-        $csvDate = mb_convert_encoding($csvDate, 'SJIS-win', 'UTF-8');
+        return redirect(route('worktimeIndex'));
+    }
+
+    public function exeWorktimeCsvTotal(Request $request)
+    {
+        if(intval($request['month']) >= 1 && intval($request['month']) <= 12){
+
+            $month = intval($request['month']);
+
+            $worktimes = DB::table('worktimes as W') 
+                        ->select('U.code', 'U.name')
+                        ->selectRaw('SEC_TO_TIME(SUM(
+                                            CASE
+                                                WHEN TIME_TO_SEC(TIMEDIFF(W.end_time, W.start_time)) >= 9*3600
+                                                    THEN TIME_TO_SEC(TIMEDIFF(W.end_time, W.start_time)) - 3600
+                                                ELSE
+                                                    TIME_TO_SEC(TIMEDIFF(W.end_time, W.start_time))
+                                            END
+                                        )) as workingtime')
+                        ->selectRaw('SEC_TO_TIME(SUM(
+                                            CASE
+                                                WHEN TIME_TO_SEC(TIMEDIFF(W.end_time, W.start_time)) >= 9*3600
+                                                    THEN TIME_TO_SEC(TIMEDIFF(W.end_time, W.start_time)) - 32400
+                                                ELSE
+                                                    0
+                                            END
+                                        )) as overtime')
+                        ->join('users as U', 'W.user_id', '=', 'U.id')
+                        ->whereYear('W.date', now()->year)
+                        ->whereMonth('W.date', $month)
+                        ->groupBy('U.code', 'U.name')
+                        ->orderBy('code', 'asc')
+                        ->get();
+
+            //コレクションが空なら戻す
+            if($worktimes->isEmpty()){
+                return redirect(route('worktimeIndex'))->with('danger', 'データがありません。');
+            }
+
+            // ヘッダーを設定する
+            $header = ['従業員番号', '従業員名', '労働時間(合計)', '残業時間(合計)'];
+
+            // 各行の設定をする
+            $rows = [];
+
+            foreach($worktimes as $worktime){
+                
+                $rows[] = [
+                    $worktime->code,
+                    $worktime->name,
+                    $worktime->workingtime,
+                    $worktime->overtime,
+                ];
+
+            }
+
+            // CSVファイルを作成し、データを書き込む
+            $csv = Writer::createFromString('');
+            $csv->insertOne($header);
+            $csv->insertAll($rows);
+            $csvDate = $csv->getContent();
+            $csvDate = mb_convert_encoding($csvDate, 'SJIS-win', 'UTF-8');
+            
+            // CSVをダウンロードするためのレスポンスを作成する
+            $response = new Response($csvDate, 200, [
+                'Content-Type' => 'text/csv',
+                'Content-Disposition' => 'attachment; filename=' . $month . '月の勤怠情報の集計.csv'
+            ]);
         
-        // CSVをダウンロードするためのレスポンスを作成する
-        $response = new Response($csvDate, 200, [
-            'Content-Type' => 'text/csv',
-            'Content-Disposition' => 'attachment; filename=' . $month . '月の勤怠情報一覧.csv'
-        ]);
-       
-        return $response;
+            return $response;
+        }
+
+        return redirect(route('worktimeIndex'));
     }
 }
