@@ -8,6 +8,10 @@ use App\Models\Worktime;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 use App\Http\Requests\UpdateWorktimeRequest;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Response;
+use League\Csv\Writer;
+use DateTime;
 
 class WorktimeController extends Controller
 {
@@ -53,12 +57,12 @@ class WorktimeController extends Controller
 
     public function showWorktimeIndex(Request $request)
     {
-        if($request['month']){
-            $selectedMonth = $request['month'];
+        if(intval($request['month']) >= 1 && intval($request['month']) <= 12){
+            $selectedMonth = intval($request['month']);
         }else{
-            $selectedMonth = Carbon::now()->format('m');
+            $selectedMonth = intval(Carbon::now()->format('m'));
         }
-
+        
         $months = [];
         for ($i = 1; $i <= 12; $i++) {
             $month = Carbon::create(null, $i, null, 0, 0, 0);
@@ -116,5 +120,69 @@ class WorktimeController extends Controller
         }
 
         return redirect(route('worktimeIndex'))->with('success', '更新が完了しました。');
+    }
+
+    public function exeWorktimeCsvDetail(Request $request)
+    {
+        $month = intval($request['month']);
+
+        $worktimes = DB::table('worktimes as W') 
+                    ->select('W.date', 'U.code', 'U.name')
+                    ->selectRaw('SEC_TO_TIME(
+                                        CASE
+                                            WHEN TIME_TO_SEC(TIMEDIFF(W.end_time, W.start_time)) >= 9*3600
+                                                THEN TIME_TO_SEC(TIMEDIFF(W.end_time, W.start_time)) - 3600
+                                            ELSE
+                                                TIME_TO_SEC(TIMEDIFF(W.end_time, W.start_time))
+                                        END
+                                    ) as workingtime')
+                    ->selectRaw('SEC_TO_TIME(
+                                        CASE
+                                            WHEN TIME_TO_SEC(TIMEDIFF(W.end_time, W.start_time)) >= 9*3600
+                                                THEN TIME_TO_SEC(TIMEDIFF(W.end_time, W.start_time)) - 32400
+                                            ELSE
+                                                0
+                                        END
+                                    ) as overtime')
+                    ->join('users as U', 'W.user_id', '=', 'U.id')
+                    ->whereMonth('W.date', $month)
+                    ->orderBy('code', 'asc')
+                    ->orderBy('date', 'asc')
+                    ->get();
+
+        // ヘッダーを設定する
+        $header = ['出勤日', '従業員番号', '従業員名', '労働時間', '残業時間'];
+
+        // 各行の設定をする
+        $rows = [];
+
+        foreach($worktimes as $worktime){
+            
+            $workingtime = new DateTime($worktime->workingtime);
+            $overtime = new DateTime($worktime->overtime);
+
+            $rows[] = [
+                $worktime->date,
+                $worktime->code,
+                $worktime->name,
+                $workingtime->format('H:i'),
+                $overtime->format('H:i'),
+            ];
+        }
+
+        // CSVファイルを作成し、データを書き込む
+        $csv = Writer::createFromString('');
+        $csv->insertOne($header);
+        $csv->insertAll($rows);
+        $csvDate = $csv->getContent();
+        $csvDate = mb_convert_encoding($csvDate, 'SJIS-win', 'UTF-8');
+        
+        // CSVをダウンロードするためのレスポンスを作成する
+        $response = new Response($csvDate, 200, [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename=' . $month . '月の勤怠情報一覧.csv'
+        ]);
+       
+        return $response;
     }
 }

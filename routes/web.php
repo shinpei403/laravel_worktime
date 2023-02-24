@@ -36,6 +36,9 @@ Route::middleware(['auth'])->group(function () {
 
       //勤怠更新
       Route::post('worktime/update', [WorktimeController::class, 'exeWorktimeUpdate'])->name('worktimeUpdate');
+
+      //勤怠情報をCSVでダウンロードする
+      Route::get('worktime/csvDetail', [WorktimeController::class, 'exeWorktimeCsvDetail'])->name('worktimeCsvDetail');
   });
 
   //勤怠登録画面を表示
