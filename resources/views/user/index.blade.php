@@ -43,7 +43,9 @@
             </tr>
             @endforeach
         </table>
-       {{ $users->links() }}
+        <div class="d-flex justify-content-center">
+            {{ $users->links() }}
+        </div>
         <a href="{{ route('userCreate') }}" class="link-primary">新規従業員の登録</a>
     </div>
   </div>

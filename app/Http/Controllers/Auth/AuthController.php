@@ -38,8 +38,8 @@ class AuthController extends Controller
     /**
      * ユーザーをアプリケーションからログアウトさせる
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @param  Request  $request
+     * @return Response
      */
     public function exeLogout(Request $request)
     {

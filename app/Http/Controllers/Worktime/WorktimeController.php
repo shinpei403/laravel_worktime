@@ -14,6 +14,10 @@ use League\Csv\Writer;
 
 class WorktimeController extends Controller
 {
+    /**
+     * 勤怠登録画面を表示する
+     * @return view, Worktime $worktime
+     */
     public function showWorktimeCreate()
     {
         $worktime = Worktime::where('date', Carbon::today()->toDateString())
@@ -22,6 +26,10 @@ class WorktimeController extends Controller
         return view('worktime.create', ['worktime' => $worktime]);
     }
 
+    /**
+     * 勤怠情報を登録する
+     * @param $request
+     */
     public function exeWorktimeStore(Request $request)
     {
         $inputs = $request->all();
@@ -54,6 +62,11 @@ class WorktimeController extends Controller
 
     }
 
+    /**
+     * 勤怠情報一覧を表示する
+     * @param Request $request
+     * @return view, array $month, int $selectedMonth
+     */
     public function showWorktimeIndex(Request $request)
     {
         if(intval($request['month']) >= 1 && intval($request['month']) <= 12){
@@ -86,6 +99,11 @@ class WorktimeController extends Controller
         return view('worktime.index', ['worktimes' => $worktimes, 'months' => $months, 'selectedMonth' => $selectedMonth]);
     }
 
+    /**
+     * 勤怠情報編集画面を表示する
+     * @param Worktime $id
+     * @return view, Worktime $worktime
+     */
     public function showWorktimeEdit($id)
     {
         $worktime = Worktime::find($id);
@@ -98,6 +116,10 @@ class WorktimeController extends Controller
         return view('worktime.edit', ['worktime' => $worktime]);
     }
 
+    /**
+     * 勤怠情報を更新する
+     * @param UpdateWorktimeRequest $request
+     */
     public function exeWorktimeUpdate(UpdateWorktimeRequest $request)
     {
         $inputs = $request->all();
@@ -121,6 +143,11 @@ class WorktimeController extends Controller
         return redirect(route('worktimeIndex'))->with('success', '更新が完了しました。');
     }
 
+    /**
+     * CSVで勤怠情報一覧を出力する
+     * @param Request $request
+     * @return Response $response
+     */
     public function exeWorktimeCsvDetail(Request $request)
     {
         if(intval($request['month']) >= 1 && intval($request['month']) <= 12){
@@ -190,9 +217,14 @@ class WorktimeController extends Controller
             return $response;
         }
 
-        return redirect(route('worktimeIndex'));
+        return redirect(route('worktimeIndex'))->with('danger', 'データがありません。');
     }
 
+    /**
+     * CSVで勤怠情報集計を出力する
+     * @param Request $request
+     * @return Response $response
+     */
     public function exeWorktimeCsvTotal(Request $request)
     {
         if(intval($request['month']) >= 1 && intval($request['month']) <= 12){
@@ -262,6 +294,6 @@ class WorktimeController extends Controller
             return $response;
         }
 
-        return redirect(route('worktimeIndex'));
+        return redirect(route('worktimeIndex'))->with('danger', 'データがありません。');
     }
 }

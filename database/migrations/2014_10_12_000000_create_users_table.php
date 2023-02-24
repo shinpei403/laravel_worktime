@@ -19,9 +19,7 @@ class CreateUsersTable extends Migration
                 $table->string('code', 6)->unique();
                 $table->string('name', 100);
                 $table->string('password');
-                $table->integer('error_count')->default(0)->unsigned();
                 $table->string('role')->nullable();
-                $table->tinyInteger('locked_flg')->default(0);
                 $table->tinyInteger('delete_flg')->default(0);
                 $table->timestamp('updated_at')->useCurrent()->nullable();
                 $table->timestamp('created_at')->useCurrent()->nullable();
