@@ -33,7 +33,7 @@
   <li>composer installを実行する</li>
   <li>php artisan key:generate を実行する。</li>
   <li>php artisan migrate</li>
-  <li>phpmyadminなどでユーザーを追加する</li>
+  <li>>php artisan db:seed --class=UserSeeder 実行する。</li>
   <li>php artisan serve を実行する。</li>
 </ol>
 
@@ -41,7 +41,7 @@
 
   1.http://localhost/laravel-worktime/public/login/show にアクセスします<br>
   
-  2.登録したユーザーの従業員番号とパスワードを入力して、ログインします。<br>
+  2.従業員番号とパスワードを入力してログインします。(初期値 従業員番号:d00001 パスワード:password)<br>
   
   3.ログイン後、各機能を使用することが出来ます。<br>
   
