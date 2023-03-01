@@ -28,7 +28,7 @@ class User extends Authenticatable
 
     public function worktime()
     {
-        return $this->hasOne('App\Models\Worktime');
+        return $this->hasMany('App\Models\Worktime');
     }
 
     /**
