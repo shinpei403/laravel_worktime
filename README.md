@@ -32,7 +32,7 @@
   <li>env.example を .env にコピーし、適宜環境変数を設定する。</li>
   <li>composer installを実行する</li>
   <li>php artisan key:generate を実行する。</li>
-  <li>php artisan migrate</li>
+  <li>php artisan migrate を実行する</li>
   <li>php artisan db:seed --class=UserSeeder 実行する。</li>
   <li>php artisan serve を実行する。</li>
 </ol>
