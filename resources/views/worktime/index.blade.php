@@ -3,9 +3,8 @@
 @section('content')
   <div class="row">
     <div class="col-md-12">
-        <h2>{{ $selectedMonth }} 月の勤怠一覧</h2>
-        </br>
-
+        <h2 class="mb-3">{{ $selectedMonth }} 月の勤怠一覧</h2>
+      
         <x-alert type="success" :session="session('success')" />
 
         <x-alert type="danger" :session="session('danger')" />
@@ -25,10 +24,9 @@
               @endforeach
             </select>
           </div>
-          <button type="submit" class="btn btn-primary">表示</button>
+          <button type="submit" class="btn btn-primary mb-3">表示</button>
         </form>
-        </br>
-
+        
         <table class="table table-striped">
             <tr>
                 <th>出勤日</th>
@@ -64,7 +62,7 @@
             @endforeach
         </table>
         <div class="d-flex justify-content-center align-items-start">
-          <div class="pr-3">
+          <div class="mr-3">
             {{ $worktimes->links() }}
           </div>
           @if(Auth::user()->role === 'admin' && !$worktimes->isEmpty())

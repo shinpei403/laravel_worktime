@@ -2,9 +2,9 @@
 @section('title', '従業員詳細')
 @section('content')
 <div class="row">
-    <div class="col-md-10 col-md-offset-2">
-        <h2>id : {{ $user->id }} の従業員情報 詳細ページ</h2>
-        </br>
+    <div class="col-md-8 offset-2">
+        <h2 class="mb-3">id : {{ $user->id }} の従業員情報 詳細ページ</h2>
+
         <table class="table table-bordered">
             <tr>
                 <th>従業員番号</th>
@@ -31,11 +31,9 @@
                 <td>{{ $user->updated_at }}</td>
             </tr>
         </table>
-        </br>
         <div>
             <a href="{{ route('userIndex') }}" class="link-primary">従業員一覧に戻る</a> 
         </div>
     </div>
 </div>
-
 @endsection
