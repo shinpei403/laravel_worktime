@@ -3,7 +3,7 @@
 @section('content')
 <div class="row">
     <div class="col-md-9 offset-1">
-      <h2>勤怠登録</h2>
+      <h2 class="mb-3">勤怠登録</h2>
 
       @if(isset($worktime->working_flg) && $worktime->working_flg === 0)
         <div class="alert alert-warning" role="alert">
@@ -13,15 +13,14 @@
 
       <x-alert type="success" :session="session('success')" />
       
-      <div class="text-center">
+      <div class="text-center mb-3">
         <div id="current-time" style="font-size: 70px;"></div>
       </div>
-      </br>
       <form id="worktime-form" method="POST" action="{{ route('worktimeStore') }}">
           @csrf
           <div class="form-group row justify-content-center">
                 <div class="col-md-6 d-flex">
-                    <div class="pr-3">
+                    <div class="mr-3">
                         @if(isset($worktime->working_flg) && ($worktime->working_flg === 1 || $worktime->working_flg === 0))
                             <button id="start-button" type="button" class="btn btn-primary btn-lg" disabled>出勤する</button>
                         @else
@@ -29,7 +28,7 @@
                         @endif
                         <input id="start_time" type="hidden" name="start_time">
                     </div>
-                    <div class="pr-3">
+                    <div class="mr-3">
                         @if(isset($worktime->working_flg) && $worktime->working_flg === 1)
                             <button id="end-button" type="button" class="btn btn-secondary btn-lg">退勤する</button>
                         @else

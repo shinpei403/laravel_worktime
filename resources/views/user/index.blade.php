@@ -3,7 +3,7 @@
 @section('content')
   <div class="row">
     <div class="col-md-9 offset-1">
-        <h2>従業員一覧</h2>
+        <h2 class="mb-3">従業員一覧</h2>
         </br>
         
         <x-alert type="success" :session="session('success')" />
