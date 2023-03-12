@@ -21,8 +21,8 @@ class CreateWorktimesTable extends Migration
                 $table->time('start_time');
                 $table->time('end_time')->nullable();
                 $table->tinyInteger('working_flg')->default(1);
-                $table->timestamp('updated_at')->useCurrent()->nullable();
-                $table->timestamp('created_at')->useCurrent()->nullable();
+                $table->timestamp('created_at')->default(\DB::raw('CURRENT_TIMESTAMP'));
+                $table->timestamp('updated_at')->default(\DB::raw('CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP'));
 
                 $table->foreign('user_id')->references('id')->on('users');
             });
