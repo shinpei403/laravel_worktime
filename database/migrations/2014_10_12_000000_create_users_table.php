@@ -21,8 +21,8 @@ class CreateUsersTable extends Migration
                 $table->string('password');
                 $table->string('role')->nullable();
                 $table->tinyInteger('delete_flg')->default(0);
-                $table->timestamp('updated_at')->useCurrent()->nullable();
-                $table->timestamp('created_at')->useCurrent()->nullable();
+                $table->timestamp('created_at')->default(\DB::raw('CURRENT_TIMESTAMP'));
+                $table->timestamp('updated_at')->default(\DB::raw('CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP'));
             });
         }
     }
