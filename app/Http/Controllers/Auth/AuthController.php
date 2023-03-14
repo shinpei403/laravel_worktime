@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Http\Requests\LoginRequest;
 use Illuminate\Support\Facades\Auth;
+use App\Models\User;
 
 class AuthController extends Controller
 {
@@ -24,6 +25,12 @@ class AuthController extends Controller
      */
     public function exeLogin(LoginRequest $request)
     {
+        $user = User::whereCode($request['code'])->first();
+        // dd($user);
+        if($user->delete_flg === 1){
+            return back()->with('danger', '従業員番号かパスワードが間違っています。');
+        }
+
         $credentials = $request->only('code', 'password');
 
         if (Auth::attempt($credentials)) {
