@@ -26,8 +26,8 @@ class AuthController extends Controller
     public function exeLogin(LoginRequest $request)
     {
         $user = User::whereCode($request['code'])->first();
-        // dd($user);
-        if($user->delete_flg === 1){
+        
+        if(is_null($user) || $user->delete_flg === 1){
             return back()->with('danger', '従業員番号かパスワードが間違っています。');
         }
 
