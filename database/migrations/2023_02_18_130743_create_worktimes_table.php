@@ -17,12 +17,12 @@ class CreateWorktimesTable extends Migration
             Schema::create('worktimes', function (Blueprint $table) {
                 $table->id();
                 $table->unsignedBigInteger('user_id');
-                $table->date('date')->default(DB::raw('CURRENT_TIMESTAMP'))->nullable();
+                $table->date('date');
                 $table->time('start_time');
                 $table->time('end_time')->nullable();
                 $table->tinyInteger('working_flg')->default(1);
-                $table->timestamp('created_at')->default(\DB::raw('CURRENT_TIMESTAMP'));
-                $table->timestamp('updated_at')->default(\DB::raw('CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP'));
+                $table->timestamp('created_at')->useCurrent();
+                $table->timestamp('updated_at')->nullable()->default(null)->onUpdate(DB::raw('CURRENT_TIMESTAMP'));
 
                 $table->foreign('user_id')->references('id')->on('users');
             });
