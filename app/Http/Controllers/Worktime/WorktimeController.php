@@ -37,6 +37,7 @@ class WorktimeController extends Controller
         try{
             //出勤時間を登録
             if(!is_null($inputs['start_time'])){
+                $inputs['date'] =  Carbon::now()->toDateString();
                 Worktime::create($inputs);
                 \DB::commit();
             }
