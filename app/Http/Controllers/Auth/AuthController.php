@@ -10,6 +10,12 @@ use App\Models\User;
 
 class AuthController extends Controller
 {
+
+    public function __construct(User $user)
+    {
+        $this->user = $user;
+    }
+
     /**
      * ログインフォームを表示する
      * @return view
@@ -25,11 +31,14 @@ class AuthController extends Controller
      */
     public function exeLogin(LoginRequest $request)
     {
-        $user = User::whereCode($request['code'])->first();
+
+        $user = $this->user->getUserByCode($request['code']);
         
-        if(is_null($user) || $user->delete_flg === 1){
+        if($this->user->hasUser($user)){
             return back()->with('danger', '従業員番号かパスワードが間違っています。');
         }
+
+        // ここから
 
         $credentials = $request->only('code', 'password');
 
