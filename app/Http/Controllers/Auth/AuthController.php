@@ -38,8 +38,6 @@ class AuthController extends Controller
             return back()->with('danger', '従業員番号かパスワードが間違っています。');
         }
 
-        // ここから
-
         $credentials = $request->only('code', 'password');
 
         if (Auth::attempt($credentials)) {
