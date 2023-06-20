@@ -48,4 +48,24 @@ class User extends Authenticatable
     // protected $casts = [
     //     'email_verified_at' => 'datetime',
     // ];
+
+    /**
+     * 従業員番号に一致する従業員を返す
+     * @param string $code
+     * @return object $user
+     */
+    public function getUserByCode($code)
+    {
+        return User::where('code', '=', $code)->first();
+    }
+
+    /**
+     * 従業員が存在しているか、削除されていないか(存在しなければtrueを返す)
+     * @param object $user
+     * @return bool 
+     */
+    public function hasUser($user)
+    {
+        return is_null($user) || $user->delete_flg === 1;
+    }
 }
