@@ -32,7 +32,7 @@ class AuthController extends Controller
     public function exeLogin(LoginRequest $request)
     {
 
-        $user = $this->user->getUserByCode($request['code']);
+        $user = $this->user->fetchUserByCode($request['code']);
         
         if($this->user->hasUser($user)){
             return back()->with('danger', '従業員番号かパスワードが間違っています。');
