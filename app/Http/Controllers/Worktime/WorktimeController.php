@@ -14,53 +14,41 @@ use League\Csv\Writer;
 
 class WorktimeController extends Controller
 {
+    public function __construct(Worktime $worktime)
+    {
+        $this->worktime = $worktime;
+    }
+    
     /**
      * 勤怠登録画面を表示する
+     * @param void
      * @return view, Worktime $worktime
      */
     public function showWorktimeCreate()
     {
-        $worktime = Worktime::where('date', Carbon::today()->toDateString())
-                     ->where('user_id', auth()->id())
-                     ->first();
+        $worktime = $this->worktime->fetchWorktimeByToday();
+    
         return view('worktime.create', ['worktime' => $worktime]);
     }
 
     /**
      * 勤怠情報を登録する
-     * @param $request
+     * @param Request $request
      */
     public function exeWorktimeStore(Request $request)
     {
         $inputs = $request->all();
-        \DB::beginTransaction();
-        try{
-            //出勤時間を登録
-            if(!is_null($inputs['start_time'])){
-                $inputs['date'] =  Carbon::now()->toDateString();
-                Worktime::create($inputs);
-                \DB::commit();
-            }
-            //退勤時間を登録
-            if(!is_null($inputs['end_time'])){
-                $worktime = Worktime::where('date', Carbon::today()->toDateString())
-                     ->where('user_id', auth()->id())
-                     ->first();
-                $worktime->fill([
-                    'end_time' => $inputs['end_time'],
-                    'working_flg' => 0, //退社のフラグを設定
-                ]);
-                $worktime->save();
-                \DB::commit();
-            }
+        $status = 'danger';
+        $message = '登録に失敗しました。';
 
-        } catch(\Throwable $e){
-            \DB::rollback();
-            Log::error($e->getMessage());
-            abort(500);
+        if($this->worktime->storeWorktime($inputs)){
+
+            $status = 'success';
+            $message = '登録が完了しました。';
+
         }
-        return redirect(route('worktimeCreate'))->with('success', '登録が完了しました。');
 
+        return redirect(route('worktimeCreate'))->with($status, $message);
     }
 
     /**
@@ -70,31 +58,22 @@ class WorktimeController extends Controller
      */
     public function showWorktimeIndex(Request $request)
     {
-        if(intval($request['month']) >= 1 && intval($request['month']) <= 12){
-            $selectedMonth = intval($request['month']);
-        }else{
-            $selectedMonth = intval(Carbon::now()->format('m'));
-        }
+        // 月のパラメータを確認して、設定する
+        $month = intval($request['month']);
+        $selectedMonth = $this->worktime->checkMonth($month);
         
-        $months = [];
-        for ($i = 1; $i <= 12; $i++) {
-            $month = Carbon::create(null, $i, null, 0, 0, 0);
-            $key = $month->format('m');
-            $value = $month->format('m月');
-            $months[$key] = $value;
-        }
+        // 月の配列を作製する
+        $months = $this->worktime->createMonthArr();
         
         if(auth()->user()->role === 'admin'){
-            $worktimes = Worktime::whereYear('date', now()->year)
-                        ->whereMonth('date', $selectedMonth)
-                        ->orderBy('date', 'asc')
-                        ->paginate(10);
+
+            // 管理者の場合は全従業員の勤怠情報を取得する
+            $worktimes = $this->worktime->fetchAllWorktimes($selectedMonth);
+
         } else{
-            $worktimes = Worktime::where('user_id', auth()->id())
-                        ->whereYear('date', now()->year)
-                        ->whereMonth('date', $selectedMonth)
-                        ->orderBy('date', 'asc')
-                        ->paginate(10);
+
+            // ログイン者の勤怠情報を取得する
+            $worktimes = $this->worktime->fetchLoginUserWorktimes($selectedMonth);
         }
         
         return view('worktime.index', ['worktimes' => $worktimes, 'months' => $months, 'selectedMonth' => $selectedMonth]);
@@ -102,14 +81,14 @@ class WorktimeController extends Controller
 
     /**
      * 勤怠情報編集画面を表示する
-     * @param Worktime $id
+     * @param int $id
      * @return view, Worktime $worktime
      */
     public function showWorktimeEdit($id)
     {
-        $worktime = Worktime::find($id);
-        if(is_null($worktime))
-        {
+        $worktime = $this->worktime->fetchWorktimeById($id);
+
+        if(is_null($worktime)){
             return redirect(route('worktimeIndex'))->with('danger', 'データがありません。');
 
         } 
@@ -124,26 +103,20 @@ class WorktimeController extends Controller
     public function exeWorktimeUpdate(UpdateWorktimeRequest $request)
     {
         $inputs = $request->all();
-        \DB::beginTransaction();
-        try{
-            // 従業員を更新  
-            $worktime = Worktime::find($inputs['id']);
-            $worktime->fill([
-                'start_time' => $inputs['start_time'],
-                'end_time' => $inputs['end_time'],
-                'working_flg' => 0,
-            ]);
-            $worktime->save();
-            \DB::commit();
-        } catch(\Throwable $e){
-            \DB::rollback();
-            Log::error($e->getMessage());
-            abort(500);
-        }
+        $status = 'danger';
+        $message = '更新に失敗しました。';
 
-        return redirect(route('worktimeIndex'))->with('success', '更新が完了しました。');
+        if($this->worktime->updateWorktime($inputs)){
+
+            $status = 'success';
+            $message = '更新が完了しました。';
+
+        }
+        
+        return redirect(route('worktimeIndex'))->with($status, $message);
     }
 
+    // ここから
     /**
      * CSVで勤怠情報一覧を出力する
      * @param Request $request
