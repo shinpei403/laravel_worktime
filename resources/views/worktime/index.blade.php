@@ -67,9 +67,9 @@
           </div>
           @if(Auth::user()->role === 'admin' && !$worktimes->isEmpty())
             <div class="pr-3">
-              <a href="{{ route('worktimeCsvDetail', ['month' => $selectedMonth]) }}" class="btn btn-primary">明細表出力</a>
+              <a href="{{ route('worktimeCsv', ['month' => $selectedMonth, 'fileType' => 'detail']) }}" class="btn btn-primary">明細表出力</a>
             </div>
-            <a href="{{ route('worktimeCsvTotal', ['month' => $selectedMonth]) }}" class="btn btn-primary">集計表出力</a>
+            <a href="{{ route('worktimeCsv', ['month' => $selectedMonth, 'fileType' => 'total']) }}" class="btn btn-primary">集計表出力</a>
           @endif
         </div>
         <a href="{{ route('worktimeCreate') }}" class="link-primary">勤怠登録画面に戻る</a>

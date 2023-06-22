@@ -118,59 +118,49 @@ class WorktimeController extends Controller
      * @param Request $request
      * @return Response $response
      */
-    public function exeWorktimeCsvDetail(Request $request)
+    public function exeWorktimeCsv(Request $request)
     {
         $month = intval($request['month']);
 
         if($month >= 1 && $month <= 12){
 
-            // 指定月の勤怠情報を取得する
-            $worktimes = $this->worktime->fetchWorktimesForDetailCsv($month);
+            $fileType = $request['file'];
 
-            //配列が空なら戻す
-            if($worktimes->isEmpty()){
-                return redirect(route('worktimeIndex'))->with('danger', 'データがありません。');
+            if($fileType === 'detail'){
+
+                // 明細表のデータを取得する
+                $worktimes = $this->worktime->fetchWorktimesForDetailCsv($month);
+
+            } else{
+                
+                // 集計表のデータを取得する
+                $worktimes = $this->worktime->fetchWorktimesForTotalCsv($month);
             }
-
-            // CSVファイル(明細表)を作製する
-            $csvData = $this->worktime->createDeteilCsvFile($worktimes);
-
-            // CSVをダウンロードするためのレスポンスを作成する
-            $response = response($csvData, 200) 
-                        ->header('Content-Type', 'text/csv')
-                        ->header('Content-Disposition', 'attachment; filename=' . $month . '月の勤怠情報の一覧.csv');
             
-            return $response;
-        }
-
-        return redirect(route('worktimeIndex'))->with('danger', 'データがありません。');
-    }
-
-    /**
-     * CSVで勤怠情報集計を出力する
-     * @param Request $request
-     * @return Response $response
-     */
-    public function exeWorktimeCsvTotal(Request $request)
-    {
-        $month = intval($request['month']);
-
-        if($month >= 1 && $month <= 12){
-
-            $worktimes = $this->worktime->fetchWorktimesForTotalCsv($month);
 
             //配列が空なら戻す
             if($worktimes->isEmpty()){
                 return redirect(route('worktimeIndex'))->with('danger', 'データがありません。');
             }
 
-            // CSVファイル(集計表)を作製する
-            $csvData = $this->worktime->createTotalCsvFile($worktimes);
+            if($fileType === 'detail'){
+
+                // CSVファイル(明細表)を作製する
+                $csvData = $this->worktime->createDeteilCsvFile($worktimes);
+                $str = '月の勤怠情報の一覧.csv';
+
+            } else{
+                
+                // CSVファイル(集計表)を作製する
+                $csvData = $this->worktime->createTotalCsvFile($worktimes);
+                $str = '月の勤怠情報の集計.csv';
+            }
+
 
             // CSVをダウンロードするためのレスポンスを作成する
             $response = response($csvData, 200) 
                         ->header('Content-Type', 'text/csv')
-                        ->header('Content-Disposition', 'attachment; filename=' . $month . '月の勤怠情報の集計.csv');
+                        ->header('Content-Disposition', 'attachment; filename=' . $month . $str);
             
             return $response;
         }
