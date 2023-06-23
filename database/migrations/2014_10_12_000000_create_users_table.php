@@ -20,6 +20,8 @@ class CreateUsersTable extends Migration
                 $table->string('name', 100);
                 $table->string('password');
                 $table->string('role')->nullable();
+                $table->integer('error_count')->unsigned()->default(0);
+                $table->tinyInteger('locked_flg')->default(0);
                 $table->tinyInteger('delete_flg')->default(0);
                 $table->timestamp('created_at')->useCurrent();
                 $table->timestamp('updated_at')->nullable()->default(null)->onUpdate(DB::raw('CURRENT_TIMESTAMP'));
