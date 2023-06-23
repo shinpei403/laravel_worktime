@@ -64,13 +64,62 @@ class User extends Authenticatable
     }
 
     /**
-     * 従業員が存在しているか、削除されていないか(存在しなければtrueを返す)
+     * 従業員が存在しているか、削除されていないか
      * @param object $user
      * @return bool 
      */
     public function hasUser($user)
     {
         return is_null($user) || $user->delete_flg === 1;
+    }
+
+    /**
+     * 従業員のアカウントがロックされているか
+     * @param int $locked_flg
+     * @return bool
+     */
+    public function isAccountLocked($locked_flg)
+    {
+        return $locked_flg === 1;
+    }
+    
+    /**
+     * 従業員のエラーカウントをリセットする
+     * @param object $user
+     * @return void
+     */
+    public function resetErrorCount($user)
+    {
+        if($user->error_count > 0){
+            $user->error_count = 0;
+            $user->save();
+        }
+    }
+
+    /**
+     * 従業員のエラーカウントを1増やす
+     * @param object $user
+     * @return void
+     */
+    public function addErrorCount($user)
+    {
+        $user->error_count++;
+        $user->save();
+    }
+
+    /**
+     * アカウントをロックする
+     * @param object $user
+     * @return bool
+     */
+    public function lockAccount($user)
+    {
+        if($user->error_count >= 5){
+            $user->locked_flg = 1;
+            return $user->save();
+        }
+
+        return false;
     }
 
     /**

@@ -31,21 +31,38 @@ class AuthController extends Controller
      */
     public function exeLogin(LoginRequest $request)
     {
+        $credentials = $request->only('code', 'password');
 
-        $user = $this->user->fetchUserByCode($request['code']);
+        // 従業員番号に一致する従業員を取得する
+        $user = $this->user->fetchUserByCode($credentials['code']);
         
+        // 従業員が取得できなければ、ログイン画面に戻る
         if($this->user->hasUser($user)){
             return back()->with('danger', '従業員番号かパスワードが間違っています。');
         }
 
-        $credentials = $request->only('code', 'password');
+        // アカウントがロックされていないか確認する
+        if($this->user->isAccountLocked($user->locked_flg)){
+            return back()->with('danger', 'アカウントがロックされています。');
+        }
 
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
 
+            // ログインしたらエラーカウントをリセットする
+            $this->user->resetErrorCount($user);
+
             return redirect()->route('worktimeCreate')->with('success', 'ログインしました。');
         }
-        
+
+        // ログイン失敗したらエラーカウントを1増やす
+        $this->user->addErrorCount($user);
+
+        // エラーカウントが5回になったら、アカウントをロックする
+        if($this->user->lockAccount($user)){
+            return back()->with('danger', 'アカウントがロックされました。管理者に連絡して下さい。');
+        }
+
         return back()->with('danger', '従業員番号かパスワードが間違っています。');
     }
 
