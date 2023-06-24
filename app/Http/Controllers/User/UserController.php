@@ -139,4 +139,23 @@ class UserController extends Controller
 
         return redirect(route('userIndex'))->with($status, $message);
     }
+
+    /**
+     * ロック解除
+     * @param int $id
+     * @return view
+     */
+    public function exeUserUnlock($id)
+    {
+        $status = 'danger';
+        $message = 'ロック解除に失敗しました。';
+
+        if($this->user->unlockUserById($id)){
+            $status = 'success';
+            $message = 'ロック解除が完了しました。';
+        }
+
+        return redirect(route('userIndex'))->with($status, $message);
+
+    }
 }

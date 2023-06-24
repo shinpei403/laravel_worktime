@@ -14,7 +14,9 @@
             <tr>
                 <th>従業員番号</th>
                 <th>従業員名</th>
-                <th></th>
+                <th>
+                    <i class="bi bi-lock-fill"></i>
+                </th>
                 <th></th>
                 <th></th>
             </tr>
@@ -27,14 +29,21 @@
                   <td></td>
                   <td></td>
                 @else
+                @if($user->locked_flg === 1)
+                    <td>
+                        <form method="POST" action="{{ route('userUnlock', ['id' => $user->id]) }}">
+                            @csrf         
+                            <button type="submit" class="btn btn-primary">ロック解除</button>
+                        </form>
+                    </td>
+                @else
+                    <td></td>
+                @endif
                 <td>
                     <button type="button" class="btn btn-primary" onclick="location.href='{{ route('userDetail', ['id' => $user->id]) }}'">詳細</button>
                 </td>
                 <td>
-                    <button type="button" class="btn btn-primary" onclick="location.href='{{ route('userEdit', ['id' => $user->id]) }}'">編集</button>
-                </td>
-                <td>
-                    <form  method="POST" action="{{ route('userDelete', ['id' => $user->id]) }}" onSubmit="return checkDelete()">
+                    <form method="POST" action="{{ route('userDelete', ['id' => $user->id]) }}" onSubmit="return checkDelete()">
                         @csrf         
                         <button type="submit" class="btn btn-danger">削除</button>
                     </form>
