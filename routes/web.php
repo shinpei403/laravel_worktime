@@ -27,6 +27,9 @@ Route::middleware(['auth'])->group(function () {
       
       // 従業員削除
       Route::post('/user/delete/{id}', [UserController::class, 'exeUserDelete'])->name('userDelete');
+
+      // ロック解除
+      Route::post('/user/unlock/{id}', [UserController::class, 'exeUserUnlock'])->name('userUnlock');
       
       // 従業員詳細画面を表示
       Route::get('/user/{id}', [UserController::class, 'showUserDetail'])->name('userDetail');

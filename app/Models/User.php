@@ -220,4 +220,30 @@ class User extends Authenticatable
             return false;
         }
     }
+
+    /**
+     * 対象の従業員のアカウントロックを解除する
+     * @param int $id
+     * @return bool
+     */
+    public function unlockUserById($id)
+    {
+        \DB::beginTransaction();
+
+        try{
+            // ロックフラグを0にする  
+            $user = $this->fetchUserById($id);
+            $user->fill([
+                'error_count' => 0,
+                'locked_flg' => 0,
+            ]);
+            $user->save();
+            \DB::commit();
+            return true;
+        } catch(\Throwable $e){
+            \DB::rollback();
+            Log::error($e->getMessage());
+            return false;
+        }
+    }
 }

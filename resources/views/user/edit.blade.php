@@ -44,7 +44,12 @@
           <input type="hidden" name="id" value="{{ $user->id }}">
           <button type="submit" class="btn btn-primary mb-3">更新</button>
         </form>
-        <a href="{{ route('userIndex') }}" class="link-primary">従業員一覧に戻る</a>
+        <div class="mb-2">
+            <a href="{{ route('userDetail', ['id' => $user->id]) }}" class="link-primary">詳細画面に戻る</a> 
+        </div>
+        <div>
+            <a href="{{ route('userIndex') }}" class="link-primary">従業員一覧に戻る</a> 
+        </div>
     </div>
   </div>
 @endsection
