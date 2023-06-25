@@ -31,6 +31,9 @@
                 <td>{{ $user->updated_at }}</td>
             </tr>
         </table>
+        <div class="mb-2">
+            <a href="{{ route('userEdit', ['id' => $user->id]) }}" class="link-primary">この従業員を編集する</a> 
+        </div>
         <div>
             <a href="{{ route('userIndex') }}" class="link-primary">従業員一覧に戻る</a> 
         </div>

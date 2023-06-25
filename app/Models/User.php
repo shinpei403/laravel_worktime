@@ -6,6 +6,8 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 
 class User extends Authenticatable
 {
@@ -21,6 +23,8 @@ class User extends Authenticatable
         'name',
         'password',
         'role',
+        'error_count',
+        'locked_flg',
         'delete_flg',
         'created_at',
         'updated_at',
@@ -50,22 +54,196 @@ class User extends Authenticatable
     // ];
 
     /**
-     * 従業員番号に一致する従業員を返す
+     * 従業員番号に一致する従業員を取得する
      * @param string $code
      * @return object $user
      */
-    public function getUserByCode($code)
+    public function fetchUserByCode($code)
     {
         return User::where('code', '=', $code)->first();
     }
 
     /**
-     * 従業員が存在しているか、削除されていないか(存在しなければtrueを返す)
+     * 従業員が存在しているか、削除されていないか
      * @param object $user
      * @return bool 
      */
     public function hasUser($user)
     {
         return is_null($user) || $user->delete_flg === 1;
+    }
+
+    /**
+     * 従業員のアカウントがロックされているか
+     * @param int $locked_flg
+     * @return bool
+     */
+    public function isAccountLocked($locked_flg)
+    {
+        return $locked_flg === 1;
+    }
+    
+    /**
+     * 従業員のエラーカウントをリセットする
+     * @param object $user
+     * @return void
+     */
+    public function resetErrorCount($user)
+    {
+        if($user->error_count > 0){
+            $user->error_count = 0;
+            $user->save();
+        }
+    }
+
+    /**
+     * 従業員のエラーカウントを1増やす
+     * @param object $user
+     * @return void
+     */
+    public function addErrorCount($user)
+    {
+        $user->error_count++;
+        $user->save();
+    }
+
+    /**
+     * アカウントをロックする
+     * @param object $user
+     * @return bool
+     */
+    public function lockAccount($user)
+    {
+        if($user->error_count >= 5){
+            $user->locked_flg = 1;
+            return $user->save();
+        }
+
+        return false;
+    }
+
+    /**
+     * 従業員を作成日の昇順で取得する
+     * @param void
+     * @return object $users
+     */
+    public function fetchUsersSortedByCreatedAt()
+    {
+        return User::orderBy('created_at')->paginate(10);
+    }
+
+    /**
+     * 従業員をデータベースに登録する
+     * @param array $inputs
+     * @return bool 
+     */
+    public function storeUser($inputs)
+    {
+        
+        \DB::beginTransaction();
+
+        try{
+            // パスワードをハッシュ化
+            $inputs['password'] = Hash::make($inputs['password']);
+
+            // 従業員登録  
+            User::create($inputs);
+            \DB::commit();
+            return true;
+        } catch(\Throwable $e){
+            \DB::rollback();
+            Log::error($e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * IDに一致する従業員を取得する
+     * @param int $id
+     * @return object $user
+     */
+    public function fetchUserById($id)
+    {
+        return User::find($id);
+    }
+
+    /**
+     * 対象の従業員のデータベースの情報を更新する
+     * @param array $inputs
+     * @return bool
+     */
+    public function updateUser($inputs)
+    {
+        \DB::beginTransaction();
+
+        try{
+            // 従業員を更新  
+            $user = $this->fetchUserById($inputs['id']);
+
+            $user->fill([
+                'code' => $inputs['code'],
+                'name' => $inputs['name'],
+                'role' => $inputs['role'],
+            ]);
+            if($inputs['password']){
+                $user->fill(['password' => Hash::make($inputs['password'])]);
+            }
+            $user->save();
+            \DB::commit();
+            return true;
+        } catch(\Throwable $e){
+            \DB::rollback();
+            Log::error($e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * 対象の従業員を論理削除する(delete_flg 0→1)
+     * @param int $id
+     * @return bool
+     */
+    public function deleteUserById($id)
+    {
+        \DB::beginTransaction();
+
+        try{
+            // 従業員を削除  
+            $user = $this->fetchUserById($id);
+            $user->delete_flg = 1;
+            $user->save();
+            \DB::commit();
+            return true;
+        } catch(\Throwable $e){
+            \DB::rollback();
+            Log::error($e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * 対象の従業員のアカウントロックを解除する
+     * @param int $id
+     * @return bool
+     */
+    public function unlockUserById($id)
+    {
+        \DB::beginTransaction();
+
+        try{
+            // ロックフラグを0にする  
+            $user = $this->fetchUserById($id);
+            $user->fill([
+                'error_count' => 0,
+                'locked_flg' => 0,
+            ]);
+            $user->save();
+            \DB::commit();
+            return true;
+        } catch(\Throwable $e){
+            \DB::rollback();
+            Log::error($e->getMessage());
+            return false;
+        }
     }
 }

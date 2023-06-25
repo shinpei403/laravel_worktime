@@ -27,6 +27,9 @@ Route::middleware(['auth'])->group(function () {
       
       // 従業員削除
       Route::post('/user/delete/{id}', [UserController::class, 'exeUserDelete'])->name('userDelete');
+
+      // ロック解除
+      Route::post('/user/unlock/{id}', [UserController::class, 'exeUserUnlock'])->name('userUnlock');
       
       // 従業員詳細画面を表示
       Route::get('/user/{id}', [UserController::class, 'showUserDetail'])->name('userDetail');
@@ -37,11 +40,8 @@ Route::middleware(['auth'])->group(function () {
       //勤怠更新
       Route::post('worktime/update', [WorktimeController::class, 'exeWorktimeUpdate'])->name('worktimeUpdate');
 
-      //勤怠情報を明細表(CSV)でダウンロードする
-      Route::get('worktime/csvDetail', [WorktimeController::class, 'exeWorktimeCsvDetail'])->name('worktimeCsvDetail');
-
-      //勤怠情報を集計表(CSV)でダウンロードする
-      Route::get('worktime/csvTotal', [WorktimeController::class, 'exeWorktimeCsvTotal'])->name('worktimeCsvTotal');
+      //勤怠情報をCSVファイルでダウンロードする
+      Route::get('worktime/csv', [WorktimeController::class, 'exeWorktimeCsv'])->name('worktimeCsv');
 
   });
 

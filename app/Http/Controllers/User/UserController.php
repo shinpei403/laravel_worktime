@@ -7,18 +7,25 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Http\Requests\UserRequest;
 use App\Http\Requests\UpdateUserRequest;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Log;
+
 
 class UserController extends Controller
 {
+
+    public function __construct(User $user)
+    {
+        $this->user = $user;
+    }
+
     /**
      * 従業員一覧画面を表示する
+     * @param void
      * @return view
      */
     public function showUserIndex()
     {
-        $users = User::orderBy('created_at')->paginate(10);
+
+        $users = $this->user->fetchUsersSortedByCreatedAt();
 
         return view('user.index', ['users' => $users]);
 
@@ -26,6 +33,7 @@ class UserController extends Controller
 
     /**
      * 従業員登録画面を表示する
+     * @param void
      * @return view
      */
     public function showUserCreate()
@@ -37,26 +45,24 @@ class UserController extends Controller
 
     /**
      * 従業員登録
+     * @param UserRequest $request
      * @return view
      */
     public function exeUserStore(UserRequest $request)
     {
         $inputs = $request->all();
-        \DB::beginTransaction();
-        try{
-            // パスワードをハッシュ化
-            $inputs['password'] = Hash::make($inputs['password']);
+        $status = 'danger';
+        $message = '登録に失敗しました。';
+        
+        if($this->user->storeUser($inputs)){
 
-            // 従業員登録  
-            User::create($inputs);
-            \DB::commit();
-        } catch(\Throwable $e){
-            \DB::rollback();
-            Log::error($e->getMessage());
-            abort(500);
+            $status = 'success';
+            $message = '登録が完了しました。';
+
         }
         
-        return redirect(route('userIndex'))->with('success', '登録が完了しました。');
+        return redirect(route('userIndex'))->with($status, $message);
+        
     }
 
     /**
@@ -66,12 +72,11 @@ class UserController extends Controller
      */
     public function showUserDetail($id)
     {
-        $user = User::find($id);
+        $user = $this->user->fetchUserById($id);
 
-        if(is_null($user) || $user->delete_flg === 1)
-        {
+        if($this->user->hasUser($user)){
 
-        return redirect(route('userIndex'))->with('danger', 'データがありません。');
+            return redirect(route('userIndex'))->with('danger', 'データがありません。');
         
         }
 
@@ -86,10 +91,10 @@ class UserController extends Controller
      */
     public function showUserEdit($id)
     {
-        $user = User::find($id);
+        $user = $this->user->fetchUserById($id);
 
-        if(is_null($user) || $user->delete_flg === 1)
-        {
+        if($this->user->hasUser($user)){
+
             return redirect(route('userIndex'))->with('danger', 'データがありません。');
 
         } 
@@ -100,31 +105,21 @@ class UserController extends Controller
 
     /**
      * 従業員更新
+     * @param UpdateUserRequest $request
      * @return view
      */
     public function exeUserUpdate(UpdateUserRequest $request)
     {
         $inputs = $request->all();
-        \DB::beginTransaction();
-        try{
-            // 従業員を更新  
-            $user = User::find($inputs['id']);
-            $user->fill([
-                'code' => $inputs['code'],
-                'name' => $inputs['name'],
-            ]);
-            if($inputs['password']){
-                $user->fill(['password' => Hash::make($inputs['password'])]);
-            }
-            $user->save();
-            \DB::commit();
-        } catch(\Throwable $e){
-            \DB::rollback();
-            Log::error($e->getMessage());
-            abort(500);
+        $status = 'danger';
+        $message = '更新に失敗しました。';
+
+        if($this->user->updateUser($inputs)){
+            $status = 'success';
+            $message = '更新が完了しました。';
         }
-        
-        return redirect(route('userIndex'))->with('success', '更新が完了しました。');
+
+        return redirect(route('userIndex'))->with($status, $message);
     }
 
     /**
@@ -134,19 +129,33 @@ class UserController extends Controller
      */
     public function exeUserDelete($id)
     {
-        try{
-            // 従業員を削除  
-            $user = User::find($id);
-            $user->delete_flg = 1;
-            $user->save();
-            \DB::commit();
-        } catch(\Throwable $e){
-            \DB::rollback();
-            Log::error($e->getMessage());
-            abort(500);
+        $status = 'danger';
+        $message = '削除に失敗しました。';
+
+        if($this->user->deleteUserById($id)){
+            $status = 'success';
+            $message = '削除が完了しました。';
         }
 
-        return redirect(route('userIndex'))->with('success', '削除が完了しました。');
+        return redirect(route('userIndex'))->with($status, $message);
+    }
+
+    /**
+     * ロック解除
+     * @param int $id
+     * @return view
+     */
+    public function exeUserUnlock($id)
+    {
+        $status = 'danger';
+        $message = 'ロック解除に失敗しました。';
+
+        if($this->user->unlockUserById($id)){
+            $status = 'success';
+            $message = 'ロック解除が完了しました。';
+        }
+
+        return redirect(route('userIndex'))->with($status, $message);
 
     }
 }
